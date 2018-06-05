@@ -1,0 +1,113 @@
+<script src="../simpleTest.js"></script>
+
+<script>
+  // Prototype Implementation: 
+  // function concat(first) {
+  //   var array = first;
+  //   for (var i = 1; i < arguments.length; i++) {
+  //     if (Array.isArray(arguments[i])) {
+  //       for (var el = 0; el < arguments[i].length; el++) {
+  //         array[array.length] = arguments[i][el];
+  //       }
+  //     } else {
+  //       array[array.length] = arguments[i];
+  //     }
+      
+  //   }
+  //   return array;
+  // } 
+
+  // Function Signature: 
+  //    concat(value1, [valueN])
+  //      arrays or values to concatenate
+  //     return value:
+  //     A new instance of an array
+
+  function concat(value) {
+    var output = [];
+    for (var u = 0; u < arguments.length; u++) {
+      if (Array.isArray(arguments[u])) {
+        for (var i = 0; i < arguments[u].length; i++) {
+          if (i in arguments[u] === false) {
+            output.length++
+          } else {
+            output.push(arguments[u][i]);
+          }
+        }
+      } else {
+        output.push(arguments[u]);
+      }
+    }
+    return output;
+  }
+        
+
+//Specs:
+  // It should return an array
+  // It should return an empty array if no arguments passed
+  // It should add each element of an array argument to output array
+  // It handles other data types besides arrays by adding them to output array
+  // It should add objects to output array while perserving their memory addresses
+  // It should handle x number of arguments
+  // It should not recursively add each element of an array within an array-argument
+  // It should not alter the original values of the arguments passed
+  //It should accept empty array values
+  
+tests({
+  'It should return an array.': function() {
+    var isArray = Array.isArray(concat([]));
+    eq(isArray, true)
+  },
+  'It should return an empty array if no arguments passed.': function() {
+    var isArray = Array.isArray(concat([]));
+    eq(isArray, true)
+  },
+  'It should add each element of an array argument to output array.': function() {
+    var input = [1, 2, 3]
+    var concated = concat(input);
+    input.forEach(function(element, index){
+      eq(element, concated[index]);
+    });
+    
+  },
+  'It handles other data types besides arrays by adding them to output array.': function() {
+    var input = [true, 5, 'string', {}, function(){}];
+    input.forEach(function(element, index){
+      eq(element, concat(element)[0]);
+    });
+  },
+  'It should add objects to output array while perserving their memory addresses.': function() {
+    var input = {};
+    eq(concat(input)[0], input)
+  },
+  'It should handle x number of arguments.': function() {
+    var concated = concat([1, 2, [3, 4]], 5, true, {}, 'hey');
+    eq(concated.length, 7);
+  },
+  'It should not recursively add each element of an array within an array-argument.': function() {
+    var concated = concat([[1]]);
+    eq(concated.length, 1);
+  },
+  'It should not alter the original values of the arguments passed.': function() {
+    var number = 1;
+    var string = 'string';
+    var innerArr = [1, 2, 3];
+    var outerArr = [1, 2, innerArr];
+    var object = {};
+    var expected = [number, string, 1, 2, innerArr, object];
+    var concated = concat(number, string, outerArr, object);
+    expected.forEach(function(element, index){
+      eq(element, concated[index]);
+    });  
+  },
+  'It should accept empty array values': function() {
+    var myConcat = concat([,]);
+    var isEmpty = (0 in myConcat === false);
+    eq(myConcat.length, 1);
+    eq(isEmpty, true);
+  }
+
+});
+
+</script>
+

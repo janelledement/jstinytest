@@ -1,0 +1,84 @@
+<script src="../simpleTest.js"></script>
+<script>
+  //Objectives:
+  //test that the function creates a new array √
+  //test that the function tests each element in the array √
+  //it should run a test for every array element and add to filtered array √
+  //test that the callback function accepts and has access to current element being processed √
+  //test that the callback accepts and has access to the index position of element being processed √
+  //test that the callback has access to array being processed √
+  //test that function accepts an option this value √
+  
+  function filter(array, callback, optionalThis) {
+    var filteredArray = [];
+
+    if (arguments.length > 2) {
+      callback = callback.bind(optionalThis);
+    }
+
+   for (var i = 0; i < array.length; i++) {
+     var isTrueOrFalse = callback(array[i], i, array);
+
+     if (isTrueOrFalse) {
+       filteredArray.push(array[i]);
+     }
+   }
+
+    return filteredArray;
+  }
+
+  tests({
+    'It should run test callback array.length times.': function() {
+       var numOfTimesCallbackRuns = 0;
+       filter([1, 2, 3], function(){
+         numOfTimesCallbackRuns++
+       });
+       eq(numOfTimesCallbackRuns, 3);
+    },
+    'It should pass in ith element as the first arguement in callback.': function() {
+      filter([1], function(num){
+        eq(num, 1);
+      });
+    },
+    'It should pass in the ith position as the second argument to the callback.': function() {
+      filter([1], function(element, index){
+        eq(index, 0);
+      });
+    },
+    'It should pass the original array as third argument to the callback.': function() {
+      var originalArray = [1];
+
+      filter(originalArray, function(element, index, array){
+        eq(originalArray, array);
+      });
+    },
+    'It should accept an optional this argument': function() {
+      var optionalThis = {description: 'I am an optional this value'}
+
+      filter([1], function(){
+        eq(this.description, 'I am an optional this value')
+      }, optionalThis);
+    },
+    'It should return a new array': function() {
+      var filteredArray = filter([1, 2, 3], function() {});
+
+      eq(Array.isArray(filteredArray), true);
+    },
+    'It should return a new array, not the array being filtered.': function() {
+      var arrayBeingFiltered = [];
+      var filteredArray = filter(arrayBeingFiltered, function() {});
+
+      eq(arrayBeingFiltered !== filteredArray, true);
+    },
+    'It should return a new array which only has elements where callback() returns truthy.': function() {
+      filteredArray = filter([1, 2, 3], function(num){
+        return num < 3
+      });
+
+      eq(filteredArray.length, 2);
+      eq(filteredArray[0], 1);
+      eq(filteredArray[1], 2);
+      
+    }
+  });
+</script>

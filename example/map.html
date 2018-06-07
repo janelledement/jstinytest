@@ -1,0 +1,97 @@
+<script src="../simpleTest.js"></script>
+<script>
+  
+// function signature: 
+//   callback
+//     current value 
+//     index position
+//     original array
+//   optional this value
+// return: a new array with each element a result of the callback function
+
+// Specs:
+  // It should return an array
+  // It should call the callback array.length times
+  // The callback should not be run on holes. 
+  // Empty values should be added to array
+  // Callback should have access to current element
+  // Callback should have access to index of current element
+  // Callback should have access to original array
+  // Map does not mutate array on which it is called
+  // It should accept an optional this value
+
+function map(array, callback, optionalThis) {
+  var output = [];
+  if (optionalThis) {
+    callback.bind(optionalThis);
+  } else {
+    for (var i = 0; i < array.length; i++) {
+      if (i in array) {
+        output.push(callback(array[i], i, array));
+      } else {
+        output.push(array[i]);
+      }
+    }
+  }
+  
+  return output;
+}
+
+ tests({
+  'It should return a new array.': function() {
+    var mapped = map([], function(){});
+    var isArray = Array.isArray(mapped);
+    eq(isArray, true);
+
+  },
+  'It should call the callback array.length times.': function() {
+    var numberOfTimesCallbackRuns = 0;
+    map([1, 2, 3], function(){
+      numberOfTimesCallbackRuns++
+    });
+    eq(numberOfTimesCallbackRuns, 3);
+  },
+  'Callback should not run on holes.': function(){
+    var numberOfTimesCallbackRuns = 0;
+    map([1, 2, ,], function(){
+      numberOfTimesCallbackRuns++
+    });
+    eq(numberOfTimesCallbackRuns, 2);
+  },
+  'Empty values should be added to array': function(){
+    var original = [1, 2, , 3]
+    var mapped = map(original, function(){});
+    eq(mapped.length, 4);
+  },
+  'Callback should have access to current element': function(){
+    map([1], function(num){
+      eq(num, 1);
+    })
+  },
+  'Callback should have access to index of current element': function(){
+    map([1], function(num, i){
+      eq(i, 0);
+    });
+  },
+  'Callback should have access to original array': function(){
+    var array = [1];
+    map(array, function(num, i, sameArrayInCallback){
+      eq(sameArrayInCallback, array);
+    });
+  },
+  //this test is probably not necessary
+  'It should not mutate array on which it is called': function(){
+    var array = [1];
+    map(array, function() {});
+    eq(array[0], 1);
+  },
+  'It should take optional this value': function() {
+    var optionalThis = {description: 'I am available inside callback'};
+    map([1], function(num){
+      eq(this.description, 'I am available inside callback');
+    }, optionalThis)
+  }
+ }); 
+</script>
+
+    

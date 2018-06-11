@@ -1,0 +1,77 @@
+<script src="../simpleTest.js"></script>
+<script>
+  //Function signature:
+    // indexOf(array, searchElement[, fromIndex])
+      // array
+      // item to search for
+      // Optional index to start searching
+  // Returns: index of found element or -1 
+
+  // Specs:
+    // It should return first index of given element found in array
+    // It should return -1 if given element is not found
+    // It should be able to start optional index position
+    // It should return -1 if optional index is greater than or equal to array.length
+    // It should accept negative values of optional index
+    // It should search from zero if negative offset in optional index surpasses the 0th index position
+
+  function indexOf(array, element, startSearchIndex) {
+    var length = array.length;
+    var index = 0;
+    
+    if (arguments.length === 3) {
+      if (startSearchIndex > 0) {
+        index = startSearchIndex;
+      }
+      if (startSearchIndex < 0) {
+        index = array.length + startSearchIndex;
+        if (index < 0) {
+          index = 0;
+        }
+      }
+    }
+
+    for (var i = index; i < length; i++) {
+      if (element === array[i]) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  tests({
+    'It should return first index of given element found in array.': function() {
+      var array = [1, 1];
+      var index = indexOf(array, 1);
+      eq(index, 0);
+    },
+    'It should return -1 if given element is not found.': function() {
+      var array = [1, 1];
+      var index = indexOf(array, 2);
+      eq(index, -1);
+    },
+    'It should be able to start optional index position.': function() {
+      var array = [1, 2, 3];
+      var index = indexOf(array, 2, 1);
+      eq(index, 1);
+    },
+    'It should return -1 if optional index is greater than or equal to array.length': function() {
+      var array = [1, 2, 3];
+      var index = indexOf(array, 2, 4);
+      eq(index, -1);
+    },
+    'It should accept negative values of optional index': function() {
+      var array = [1, 2, 3];
+      var index = indexOf(array, 3, -1);
+      eq(index, 2);
+      index = indexOf(array, 1, -1);
+      eq(index, -1)
+    },
+    'It should search from zeroth index if negative offset in optional index surpasses the 0th index position': function() {
+      var array = [1, 2, 3];
+      var index = indexOf(array, 1, -4);
+      eq(index, 0);
+    }
+  });
+
+</script>

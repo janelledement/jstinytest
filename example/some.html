@@ -1,0 +1,92 @@
+<script src="../simpleTest.js"></script>
+<script>
+
+  //Function Signature:
+  //some(array, callback[, optionalThis]);
+    //array
+    //callback
+      //current element (required)
+      //index (optional)
+      //array (optional)
+    //this value (optional)
+
+    //Return: true or false
+
+  //Specs:
+    // It should run array.length times if no element passes test in callback.
+    // It should not run callback on empty array elements.
+    // It should have access to current element inside callback.
+    // It should have access to current index inside callback.
+    // It should have access to original array inside callback.
+    // It should have access to this value inside callback, if provided as third argument.
+    // It should return true immediately if an element in array passes test in callback.
+    // It should return false if no array elements pass test in callback.
+  
+  function some(array, callback, optionalThis) {
+    var length = array.length;
+
+    if (arguments.length === 3) {
+      callback = callback.bind(optionalThis);
+    }
+
+    for (var i = 0; i < length; i++) {
+      if (i in array && callback(array[i], i, array)) {
+        return true;
+      }
+    }
+    return false;
+  }
+    
+    tests({ 
+      'It should run array.length times if no elements pass test in callback.': function() {
+        var numOfTimesCallbackRuns = 0;
+         some([1, 2, 3], function(num){
+           numOfTimesCallbackRuns++;
+           return typeof num !== 'number';
+         });
+         eq(numOfTimesCallbackRuns, 3);
+      },
+      'It should not run callback on holes.': function() {
+        var numOfTimesCallbackRuns = 0;
+         some([1, , 3], function(num){
+           numOfTimesCallbackRuns++;
+           return typeof num !== 'number';
+         });
+         eq(numOfTimesCallbackRuns, 2);
+      },
+      'It should have access to current element inside callback.': function(){
+        some([1], function(num){
+          eq(num, 1);
+        });
+      },
+      'It should have access to current index inside callback.': function(){
+        some([1], function(num, index){
+          eq(index, 0);
+        });
+      },
+      'It should have access to original array inside callback.': function(){
+        var originalArray = [1, 2, 3];
+        some(originalArray, function(num, index, array){
+          eq(originalArray, array);
+        });
+      },
+      'It should have access to this value inside callback, if provided as third argument.': function(){
+        var optionalThis = {description: 'I am available inside callback'};
+        some([1], function(num){
+          eq(optionalThis, this);
+        }, optionalThis);
+      },  
+      'It should return true immediately if an element in array passes test in callback.': function(){
+        var isTrue = some([1, 2, 3], function(num){
+          return num === 3;
+        });
+        eq(isTrue, true);
+      }, 
+      'It should return false if no array elements pass test in callback.': function() {
+        var isFalse = some([1, 2, 1], function(num){
+          return num === 3;
+        });
+        eq(isFalse, false);
+      }  
+    });
+</script>

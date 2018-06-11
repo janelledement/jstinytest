@@ -2,7 +2,7 @@
 <script>
 
   //Function Signature:
-  //find(array, callback[, optionalThis]);
+  //findIndex(array, callback[, optionalThis]);
     //array
     //callback
       //current element
@@ -10,7 +10,7 @@
       //array
     //optional this value
 
-    //Return: first element to satisfy predicate or undefined
+    //Return: index of first element to satisfy predicate or -1
 
   //Specs:
     // It should run callback array.length times
@@ -19,11 +19,11 @@
     // It should have access to current index inside callback
     // It should have access to original array inside callback
     // It should have access to provided this value inside callback, if optional this is included in third argument
-    // It should return the first element of array to return a true value on callback
-    // It should return undefined if no true value from callback is found.
+    // It should return the index of first element of array to return a true value on callback
+    // It should return -1 if no true value from callback is found.
     
     
-  function find(array, callback, optionalThis) {
+  function findIndex(array, callback, optionalThis) {
     var length = array.length;
     if (arguments.length === 3) {
       callback = callback.bind(optionalThis);
@@ -31,23 +31,24 @@
 
     for (var i = 0; i < length; i++) {
       if(callback(array[i], i, array)) {
-        return array[i];
+        return i;
       }
     }
+    return -1;
   }
 
 
   tests({
     'It should run callback array.length times.': function() {
        var numberOfTimesCallbackRuns = 0;
-       find([1, 2, 3], function(num){
+       findIndex([1, 2, 3], function(num){
          numberOfTimesCallbackRuns++
        });
        eq(numberOfTimesCallbackRuns, 3);
     },
     'It should run the callback on holes.': function() {
       var numberOfTimesCallbackRuns = 0;
-       find([1, , 3], function(num){
+       findIndex([1, , 3], function(num){
          numberOfTimesCallbackRuns++
        });
        eq(numberOfTimesCallbackRuns, 3);
@@ -75,19 +76,19 @@
       }, optionalThis);
     },
     
-    'It should return the first element of array to return a true value on callback.': function() {
-      var array = [1, 2, 1];
-      var found = find(array, function(num){
+    'It should return the index of first element of array to return a true value on callback.': function() {
+      var array = [1, 1];
+      var firstTrueIndex = findIndex(array, function(num){
         return num === 1;
       });
-      eq(found, 1);
+      eq(firstTrueIndex, 0);
     },
-    'It should return undefined if no true value from callback is found.': function() {
+    'It should return -1 if no true value from callback is found.': function() {
       var array = [2];
-      var found = find(array, function(num){
+      var firstTrueIndex = findIndex(array, function(num){
         return num === 1;
       });
-      eq(found, undefined);
+      eq(firstTrueIndex, -1);
     }
   });
 

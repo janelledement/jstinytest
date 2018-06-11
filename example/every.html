@@ -1,0 +1,107 @@
+<script src="../simpleTest.js"></script>
+<script>
+
+  //Function Signature:
+  //find(array, callback[, optionalThis]);
+    //array
+    //callback
+      //current element (required)
+      //index (optional)
+      //array (optional)
+    //this value (optional)
+
+    //Return: true or false
+
+  //Specs:
+    // It should run callback array.length times, unless false value is found
+    // It should not run the callback on empty indices
+    // It should have access to current element inside callback
+    // It should have access to current index inside callback
+    // It should have access to original array inside callback
+    // It should have access to this value inside callback, if provided as third argument
+    // It should return true if every element of array passes test in callback
+    // It should return false immediate if one element of array does not pass test in callback
+    // It should return true for empty arrays
+
+    
+    function every(array, callback, optionalThis) {
+      var length = array.length;
+
+      if (arguments.length === 3) {
+        callback = callback.bind(optionalThis);
+      }
+
+      for (var i = 0; i < length; i++) {
+        if (i in array && !callback(array[i], i, array)) {
+          return false;
+        }
+      }
+      
+      return true;
+    }
+
+    
+    tests({
+      
+      'It should have access to current element inside callback.': function(){
+        every([1], function(num){
+          eq(num, 1);
+        });
+      },
+      'It should have access to current index inside callback.': function(){
+        every([1], function(num, index){
+          eq(index, 0);
+        });
+      },
+      'It should have access to original array inside callback.': function(){
+        var originalArray = [1, 2, 3];
+        every(originalArray, function(num, index, array){
+          eq(originalArray, array);
+        });
+      },
+      'It should have access to this value inside callback, if provided as third argument.': function(){
+        var optionalThis = {description: 'I am available inside callback'};
+        every([1], function(num){
+          eq(optionalThis, this);
+        }, optionalThis);
+      },
+      'It should return false immediately if one element of array does not pass test in callback': function(){
+        var isFalse = every([1, 2, 3], function(num){
+          return num === 3;
+        });
+        eq(isFalse, false);
+      },
+      'It should return true if every element of array passes test in callback.': function(){
+        var isTrue = every([1, 2, 3], function(num){
+          return typeof num === 'number';
+        });
+        eq(isTrue, true);
+      },
+      'It should run callback array.length times, until false value is found.': function(){
+         var numOfTimesCallbackRuns = 0;
+         every([1, 2, 3], function(num){
+           numOfTimesCallbackRuns++;
+           return typeof num === 'number';
+         });
+         eq(numOfTimesCallbackRuns, 3);
+      },
+      'It should not run the callback on empty indices.': function(){
+        var numOfTimesCallbackRuns = 0;
+         every([1, , 3], function(num){
+           numOfTimesCallbackRuns++;
+           return typeof num === 'number';
+         });
+         eq(numOfTimesCallbackRuns, 2);
+      },
+      'It should return true for empty arrays.': function(){
+        var isTrue = every([,], function(num){
+          return typeof num === 'number';
+        });
+        var isAlsoTrue = every([], function(num){
+          return typeof num === 'number';
+        });
+        eq(isTrue, true);
+        eq(isAlsoTrue, true);
+      }
+    });
+</script>

@@ -1,0 +1,75 @@
+<script src="../simpleTest.js"></script>
+<script>
+  //Function signature:
+    // lastIndexOf(array, searchElement[, fromIndex])
+      // array
+      // item to search for
+      // Optional index to start searching
+  // Returns: index of found element or -1 
+
+  function lastIndexOf(array, searchElement, searchIndex){
+    var lastIndex = array.length - 1;
+
+    if (searchIndex) {
+      if (searchIndex < 0) {
+        lastIndex += (searchIndex + 1);
+      } else {
+        lastIndex = searchIndex;
+      }   
+    }
+
+    for (var i = lastIndex; i >= 0; i--) {
+      if (array[i] === searchElement) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  // Specs:
+    // It should return last index of given element found in array
+    // It should return -1 if given element is not found
+    // It should search the array backwards starting at arr.length - 1
+    // It should search the whole array if the optional index is greater or equal to the array's length.
+    // It should offset from end of array if given a negative optional index.
+    // It should not search the array if the negative index provided calculates to less than zero position.
+ 
+
+  tests({
+    'It should return the last index of given element found in array.': function() {
+      var array = [1, 1,];
+      var index = lastIndexOf(array, 1);
+      eq(index, 1);
+    },
+    'It should return -1 if given element is not found.': function() {
+      var array = [1, 1];
+      var index = lastIndexOf(array, 2);
+      eq(index, -1);
+    },
+    'It should search the array backwards starting at arr.length - 1.': function(){
+      var array = [1, 1, 1, 1, 1];
+      var index = lastIndexOf(array, 1);
+      eq(index, array.length - 1);
+    },
+    'It should search the whole array if the optional index is greater or equal to the array\'s length.': function(){
+      var array = [1, 2, 3];
+      var index = lastIndexOf(array, 1, 5);
+      eq(index, 0)
+    },
+    'It should offset from end of array if given a negative optional index. ': function(){
+      var array = [4, 4, 4, 4];
+      var index = lastIndexOf(array, 4, -1);
+      eq(3, index);
+      index = lastIndexOf(array, 4, -2);
+      eq(2, index);
+    },
+    'It should not search the array if the negative index provided calculates to less than zero position.': function(){
+      var array = [4, 4, 4, 4];
+      var index = lastIndexOf(array, 4, -5);
+      eq(-1, index);
+    }
+    
+  });
+
+</script>

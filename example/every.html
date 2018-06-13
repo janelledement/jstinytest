@@ -32,8 +32,10 @@
       }
 
       for (var i = 0; i < length; i++) {
-        if (i in array && !callback(array[i], i, array)) {
-          return false;
+        if (i in array) {
+          if (!callback(array[i], i, array)) {
+            return false;
+          }
         }
       }
       

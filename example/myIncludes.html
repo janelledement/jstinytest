@@ -1,0 +1,92 @@
+<script src="../simpleTest.js"></script>
+
+<script>
+  // Notes: I made myIncludes into a method on the array (as opposed to my other 
+  // array functions) prototype because it is is supposed to have the capacity
+  // to be used on both arrays and array-like objects.  
+  
+  // I define an object as being array-like if it satisfies two criteria:
+  // 1. It has numeric keys
+  // 2. It has a length property
+  // The arguments object is a good example of an array-like object based on
+  // these two characteristics.
+
+  //Signature: 
+    // array.myIncludes(searchElement[, fromIndex])
+     // array
+     // searchElement
+     // searchIndex (optional)
+  //Return:
+    // Boolean
+  
+  Array.prototype.myIncludes = function(searchElement, searchIndex) {
+    var length = this.length;
+    var index = 0;
+    if (searchIndex) {
+      if (searchIndex < 0) {
+        index = length + searchIndex;
+      } else {
+        index = searchIndex;  
+      }
+    }
+
+    for (var i = index; i < length; i++) {
+      if (this[i] === searchElement) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+
+  //Specs:
+    // It should search the array for given element, return true if found and false if not.
+    // It should start at optional startIndex if provided.
+    // It should return false immediately if searchIndex is greater than or equal to array.length.
+    // It should accept negative numbers for searchIndex, offsetting the position for start of search from end of array.
+    // It should search the whole array if the calculated offset from negative searchIndex is less than zero.
+    // It should be able to be used on array-objects using apply or call function methods  
+
+  tests({
+    'It should search the array for given element, return true if found and false if not.': function(){
+      var array = [1, 2, 'three'];
+      var isIncluded = array.myIncludes('three');
+      eq(true, isIncluded);
+      isIncluded = array.myIncludes('four');
+      eq(false, isIncluded);
+    },
+    'It should start at optional startIndex if provided': function(){
+      var array = [0, 1, 2];
+      var isIncluded = array.myIncludes(0, 1);
+      eq(false, isIncluded)
+    },
+    'It should return false immediately if searchIndex is greater than or equal to array.length.': function(){
+      var array = [0, 1, 2];
+      var isIncluded = array.myIncludes(0, 3);
+      eq(false, isIncluded)
+    },
+    'It should accept negative numbers for searchIndex, offsetting the position for start of search from end of array.': function(){
+      var array = [0, 1, 2];
+      var isIncluded = array.myIncludes(0, -1);
+      eq(false, isIncluded)
+    },
+    'It should search the whole array if the calculated offset from negative searchIndex is less than zero.': function(){
+      var array = [0, 1, 2];
+      var isIncluded = array.myIncludes(0, -4);
+      eq(true, isIncluded)
+    },
+    'It can be used on array-like objects using apply or call.': function() {
+      var object = {0: 'a', length: 1};
+      var isIncluded = [].myIncludes.call(object, 'a');
+      eq(isIncluded, true);
+      var isIncluded = [].myIncludes.apply(object, ['b']);
+      eq(isIncluded, false);
+    }
+    
+  });
+
+
+
+
+
+</script>

@@ -1,8 +1,8 @@
 <script src="../simpleTest.js"></script>
 
 <script>
-  // Notes: I made myIncludes into a method on the array (as opposed to my other 
-  // array functions) prototype because it is is supposed to have the capacity
+  // Notes: I made myIncludes into a method on the array prototype (as opposed 
+  // to my other array functions) because it is is supposed to have the capacity
   // to be used on both arrays and array-like objects.  
   
   // I define an object as being array-like if it satisfies two criteria:
@@ -29,7 +29,7 @@
         index = searchIndex;  
       }
     }
-
+    console.log(Array.isArray(this));
     for (var i = index; i < length; i++) {
       if (this[i] === searchElement) {
         return true;

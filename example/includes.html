@@ -1,0 +1,72 @@
+<script src="../simpleTest.js"></script>
+<script>
+  //Function Signature: 
+    // includes(array, searchElement[, fromIndex])
+     // array
+     // searchElement
+     // searchIndex (optional)
+  //Return:
+    // Boolean
+
+  function includes(array, searchElement, searchIndex){
+    var length = array.length;
+    var index = 0;
+    if (searchIndex) {
+      if (searchIndex < 0) {
+        index = length + searchIndex;
+      } else {
+        index = searchIndex;  
+      }
+    }
+    for (var i = index; i < length; i++) {
+      if (array[i] === searchElement) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  //Specs:
+    // It should search the array for given element, return true if found and false if not.
+    // It should start at optional startIndex if provided.
+    // It should return false immediately if searchIndex is greater than or equal to array.length.
+    // It should accept negative numbers for searchIndex, offsetting the position for start of search from end of array.
+    // It should search the whole array if the calculated offset from negative searchIndex is less than zero.
+    // Can be used on objects ? 
+  
+  tests({
+    'It should search the array for given element, return true if found and false if not.': function(){
+      var array = [1, 2, 'three'];
+      var isIncluded = includes(array, 'three');
+      eq(true, isIncluded);
+      isIncluded = includes(array, 'four');
+      eq(false, isIncluded);
+    },
+    'It should start at optional startIndex if provided': function(){
+      var array = [0, 1, 2];
+      var isIncluded = includes(array, 0, 1);
+      eq(false, isIncluded)
+    },
+    'It should return false immediately if searchIndex is greater than or equal to array.length.': function(){
+      var array = [0, 1, 2];
+      var isIncluded = includes(array, 0, 3);
+      eq(false, isIncluded)
+    },
+    'It should accept negative numbers for searchIndex, offsetting the position for start of search from end of array.': function(){
+      var array = [0, 1, 2];
+      var isIncluded = includes(array, 0, -1);
+      eq(false, isIncluded)
+    },
+    'It should search the whole array if the calculated offset from negative searchIndex is less than zero.': function(){
+      var array = [0, 1, 2];
+      var isIncluded = includes(array, 0, -4);
+      eq(true, isIncluded)
+    },
+    
+  });
+
+
+
+
+
+</script>

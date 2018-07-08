@@ -1,0 +1,112 @@
+<script src="../simpleTest.js"></script>
+
+<script>
+  // Notes: I made myJOin into a method on the array prototype 
+  // because it is is supposed to have the capacity to be used on
+  // both arrays and array-like objects. (Objects that have numeric
+  // keys and have a length property: e.g. argument object).
+
+  // Syntax: 
+    // arr.join([separator])
+      // seperator: an optional string that will be inserted in between each array element
+  // Return:
+    // A string with all array elements joined. 
+    // If arr.length is 0, the empty string is returned.
+
+  // Specs: 
+    // Return Cases
+      // It returns a string. 
+      // It returns an empty string if array.length is 0.    
+    
+    // About seperator:
+      // It returns a string with the seperator in between each pair of array elements.
+      // It does not add seperator to end of output string.
+      // It defaults to comma if no seperator argument.
+      // It joins with no seperation if seperator is defined as empty string.
+
+    // About data types inside arrays:
+      // It converts array numbers to strings.
+      // It uses toString() method on objects before adding to array.
+      // It converts array elements that are null or undefined to empty strings.
+      // It recursively joins array within arrays.
+      
+    // Edge cases: 
+      // It can be used with call() on array-like objects.
+  
+  Array.prototype.myJoin = function(seperator) {
+    var string = '';
+    var array = this;
+
+    if (!seperator && seperator !== '') {
+      var seperator = ',';
+    }
+    
+    for (var i = 0; i < array.length; i++) {
+      if (!array[i]) {
+        string += '';
+      } else {
+        string += array[i];
+      }
+  
+      if (i !== array.length - 1) {
+        string += seperator;
+      }
+    }
+
+    return string;
+  };
+    
+  tests({
+    'It returns a string.': function() {
+       var array = [1];
+       var string = array.myJoin(); 
+       eq(typeof string, 'string');
+    },
+    'It returns a string with the seperator in between each pair of array elements, but not the end.': function() {
+      var array = ['one', 'two'];
+      var string = array.myJoin(' + ');
+      eq(string, 'one + two');
+    },
+    'It defaults to comma if no seperator argument.': function() {
+      var array = ['one', 'two'];
+      var string = array.myJoin();
+      eq(string, 'one,two');
+    },
+    'It joins with no seperation if seperator is defined as empty string.': function() {
+      var array = ['one', 'two'];
+      var string = array.myJoin('');
+      eq(string, 'onetwo');
+    },
+    'It converts array numbers to strings.': function() {
+      var array = [1];
+      var string = array.myJoin();
+      eq(string, '1');
+    },
+    'It adds objects as [object Object] string.': function(){
+      var array = [{}];
+      var string = array.myJoin();
+      eq(string, '[object Object]');
+    },
+    'It converts array elements that are null or undefined or empty to empty strings.': function() {
+      var array = [null, , undefined,];
+      var string = array.myJoin();
+      eq(string, ',,');
+    },
+    'It joins elements of array within arrays.': function() {
+      var array = ['one', ['two', ['three', ['four'], 'five']]];
+      var string = array.myJoin();
+      eq(string, 'one,two,three,four,five');
+    },
+    'It returns an empty string if array.length is 0.': function() {
+      var array = [];
+      var string = array.myJoin();
+      eq(string, '');
+    },
+    'It can be used with call() on array-like objects.': function() {
+      var object = {0: 'one', 1: 'two', length: 2};
+      var string = Array.prototype.myJoin.call(object);
+      eq(string, 'one,two');
+    },
+  });
+
+</script>

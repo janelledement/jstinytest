@@ -1,0 +1,156 @@
+<script src="../simpleTest.js"></script>
+
+<script>
+  // Notes: I made mySlice into a method on the array prototype 
+  // because it is is supposed to have the capacity to be used on
+  // both arrays and array-like objects. (Objects that have numeric
+  // keys and have a length property: e.g. argument object).
+
+  // Syntax: 
+    // arr.slice([begin[, end]])
+    // Begin: zero based index at which to begin extraction
+    // End: zero based index before which to end extraction
+  // Return:
+    // A new array with extracted elements
+  
+  // Specs: 
+    // It returns a new array
+    // It returns a copy of the original array if no arguments are passed
+    // It should return an empty array if begin and end arguments are both zero. eq: array.slice(0, 0)
+
+    // It returns an array with extracted elements starting at begin index 
+    // It starts at zero index if no begin argument is defined
+    // It offsets from end of array if begin is negative number
+    // It copies from zero index if calculated negative begin index is below zero. 
+    // It returns an empty array if beginning is greater than array.
+
+    // It extracts up to but not the index of end parameter
+    // It extracts through end of array if end parameter is undefined.
+    // It offset from end of array, if end is negative
+    // It extracts the whole array if end is greater than length of array.
+    // It returns empty array if calculated negative end argument is less than zero.
+
+    // Slice can be used on array-like objects using call
+    // It can be simplified using bind
+
+    Array.prototype.mySlice = function(begin, end) {
+      var array = [];
+
+      if (!begin) {
+        var begin = 0;
+      }
+      if (begin < 0) {
+        begin = this.length + begin;
+        if (begin < 0) {
+          begin = 0;
+        }
+      }
+
+      if (!end && typeof end !== 'number') {
+        end = this.length;
+      }
+      if (end < 0) {
+        end = this.length + end;
+      }
+
+      for (var i = begin; i < end; i++) {
+        array.push(this[i]);
+      }
+      return array;
+    }
+
+    tests({
+      'It returns a new array.': function(){
+        var array = [];
+        var newArray = array.mySlice();
+        eq(Array.isArray(newArray), true);
+      },
+      'It returns a copy of the original array if no arguments are passed.': function(){
+        var array = [1];
+        var newArray = array.mySlice();
+        array.forEach(function(el, i){
+          eq(el, newArray[i]);
+        });
+      },
+      'It should return an empty array if end and begin arguments are zero': function(){
+        var array = [1, 2];
+        var newArray = array.mySlice(0, 0);
+        eq(newArray.length, 0);
+       },
+
+       'It returns an array with extracted elements starting at begin index.': function(){
+        var array = [1, 2];
+        var newArray = array.mySlice(1);
+        eq(newArray[0], 2);
+       },
+       'It starts at zero index if no begin argument is defined': function(){
+        var array = [1, 2];
+        var newArray = array.mySlice();
+        eq(newArray[0], 1);
+       },
+       'It offsets from end of array if begin is negative number': function(){
+        var array = [1, 2];
+        var newArray = array.mySlice(-1);
+        eq(newArray[0], 2);
+       },
+       'It starts from zero index if calculated negative beginning is below zero.': function(){
+        var array = [1, 2];
+        var newArray = array.mySlice(-3);
+        array.forEach(function(el, i){
+          eq(el, newArray[i]);
+        });
+       },
+       'It returns an empty array if beginning is greater than array length': function(){
+         var array = [1, 2];
+         var newArray = array.mySlice(2);
+         eq(newArray.length, 0)
+       },
+
+       'It extracts up to but not the index of end parameter.': function(){
+         var array = [1, 2];
+         var newArray = array.mySlice(0, 1);
+         eq(newArray.length, 1);
+         eq(newArray[0], 1);
+       },
+       'It extracts through end of array if end parameter is undefined.': function(){
+         var array = [1, 2];
+         var newArray = array.mySlice(0);
+         array.forEach(function(el, i){
+          eq(el, newArray[i]);
+        });
+       },
+       'It handles negative end indices': function(){
+        var array = [1, 2];
+        var newArray = array.mySlice(0, -1);
+        eq(newArray[0], 1);      
+       },
+       'It returns empty array if calculated negative end argument is less than or equal to zero.': function(){
+        var array = [1, 2];
+        var newArray = array.mySlice(0, -2);
+        eq(newArray.length, 0);
+       },
+
+       'It can be used on array-like objects using call': function(){
+         var array = [1, 2, 3];
+         function list() {
+           return Array.prototype.mySlice.call(arguments);
+         }
+         var newArray = list(1, 2, 3); 
+         array.forEach(function(el, i){
+          eq(el, newArray[i]);
+        });
+       },
+       'It can be simplified using bind': function(){
+         var unboundSlice = Array.prototype.mySlice;
+         var slice = Function.prototype.call.bind(unboundSlice);
+         function list() {
+           return slice(arguments);
+         }
+         var array = [1, 2, 3];
+         var newArray = list(1, 2, 3);
+         array.forEach(function(el, i){
+          eq(el, newArray[i]);
+        });
+       },
+    });
+</script>

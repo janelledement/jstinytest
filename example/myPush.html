@@ -1,0 +1,89 @@
+<script src="../simpleTest.js"></script>
+
+<script>
+  // Notes: I made myPush into a method on the array prototype 
+  // because it is is supposed to have the capacity to be used on
+  // both arrays and other objects.  
+  
+  // Signature:
+  // arr.push(element1[, ...[, elementN]])
+    //elementN: the elements to be added on to the end of the array
+  // Return:
+    // New length property on object/array
+
+  Array.prototype.myPush = function(elementN) {
+    if (Object.prototype.toString.call(this) === '[object Object]') {
+      if (!this.length) {
+        this.length = 0;
+      }
+      for (var i = 0; i < arguments.length; i++) {
+        this[this.length] = arguments[i];
+        this.length++;
+      }
+    } else {
+      for (var i = 0; i < arguments.length; i++) {
+        this[this.length] = arguments[i];
+      }
+    } 
+    return this.length; 
+  }
+
+
+  //Specs: 
+    // It should add arguments onto the end of the array on which it is called.
+    // It should handle multiple elements of different data types.
+    // It should return the new length property of array/object.
+    // It should have the ability to merge two arrays using apply
+    // It can be used on objects using apply or call
+  
+  tests({
+    'It should add arguments onto the end of the array': function() {
+      var array = [];
+      array.myPush(1);
+      eq(array[0], 1);
+    },
+    'It should handle multiple elements and different data types as well.': function() {
+      var array = [];
+      var three = ['three'];
+      var four = {four: 'four'};
+      var comparison = [1, 'two', three, four];
+      array.myPush(1, 'two', three, four);
+      comparison.forEach(function(element, i){
+        eq(element, array[i]);
+      }); 
+    },
+    'It should return the new length property of array/object.': function() {
+      var array = [];
+      var object = {}
+      eq(array.myPush(1), 1);
+      eq([].myPush.call(object, 1), 1)
+    },
+    'It should have the ability to merge two arrays using apply.': function() {
+      var comparison = [1, 2];
+      var one = [1];
+      var two = [2];
+      [].myPush.apply(one, two);
+      comparison.forEach(function(element, i){
+        eq(element, one[i]);
+      });
+    },
+    'It can be used to push elements on objects with a length property using apply or call.': function() {
+      var object = {length: 0};
+      [].myPush.call(object, 1);
+      [].myPush.apply(object, [2]);
+      eq(object[0], 1);
+      eq(object[1], 2);
+    },
+    'It adds to the length property of object for each element pushed': function() {
+      var object = {length: 0};
+      eq([].myPush.call(object, 1, 2), 2);  
+    },
+    'It can handle objects with no length property.': function() {
+      var object = {};
+      [].myPush.call(object, 1);
+      eq(object.length, 1); 
+    },
+  });
+
+
+</script>

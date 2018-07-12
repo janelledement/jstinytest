@@ -1,0 +1,194 @@
+<script src="../simpleTest.js"></script>
+
+<script>
+  // Notes: I made myJOin into a method on the array prototype 
+  // because it is is supposed to have the capacity to be used on
+  // both arrays and array-like objects as well.
+
+
+  // Syntax: 
+    // arr.copyWithin(target)
+    // arr.copyWithin(target, start)
+    // arr.copyWithin(target, start, end)
+  
+  // Specs: 
+    // It returns same array.
+    // It does not modify array.length.
+    // It can be used on array-like objects.
+
+    // target:
+      // It copies starting at this index.
+      // It calculates from end of array if negative.
+      // It defaults to zero if undefined.
+      // It defaults to zero if calculated negative index is less than zero.
+      // It does not copy anything if target is greater than array.length.
+      // It trims the copied portion to fit array.length if target is positioned after start.
+    
+    // start:
+      // It starts copy at this index.
+      // It calculates from end of array if negative. 
+      // It defaults to zero, if calculated index is negative.
+    
+    // end: 
+      // It copies up to but not including end.
+      // It calculates from end of array if negative.
+      // It defaults to array.length if not provided.
+  
+  Array.prototype.myCopyWithin = function(target, begin, end) {
+    var array = this;
+    var length = array.length;
+    var copies = [];
+    var copyStart = 0;
+    var count = 0;
+    
+    if (!target) {
+      var target = 0;
+    }
+    if (target < 0) {
+      target = target + length;
+      if (target < 0) {
+        target = 0;
+      }
+    }
+    
+    if (!begin) {
+      var begin = 0;
+    }
+    if (begin < 0) {
+      begin = begin + length;
+      if (begin < 0) {
+        begin = 0;
+      }
+    }
+
+    if (!end) {
+      var end = length;
+    }
+    if (end < 0) {
+      end = end + length;
+    }
+   
+    for (var i = begin; i < end; i++) {
+      if (i in array) {
+        copies[count] = array[i];
+      }
+      count++
+    }
+
+
+    for (var i = target; i < length; i++) {
+      if (i in copies) {
+        array[i] = copies[copyStart];
+        copyStart++
+      }
+    }
+
+    return array;
+  }
+  
+  tests({
+    // general tests
+    'It returns the same array with modifications': function() {
+      var array = [1];
+      eq(array.myCopyWithin(), array);
+    },
+    'It does not modifiy array.length': function() {
+      var array = [1];
+      eq(array.myCopyWithin().length, 1);
+    },
+    // tests for target parameter
+    'It copies starting at target index.': function() {
+      var array = [1, 2, 3];
+      array.myCopyWithin(1);
+      eq(array[0], 1);
+      eq(array[1], 1);
+      eq(array[2], 2)
+    },
+    'It calculates from end of array if target is negative.': function() {
+      var array = [1, 2];
+      array.myCopyWithin(-1);
+      eq(array[0], 1);
+      eq(array[1], 1);
+    },
+    'It defaults to zero if target is undefined.': function() {
+      var array = [1];
+      array.myCopyWithin();
+      eq(array[0], 1)
+    },
+    'It defaults to zero if calculated target is less than zero.': function() {
+      var array = [1];
+      array.myCopyWithin(-3);
+      eq(array[0], 1);
+    },
+    'It does not copy anything if target is greater than array.length.': function() {
+      var array = [1];
+      array.myCopyWithin(2);
+      eq(array[0], 1);
+    },
+    'It trims the copied portion to fit array.length if target is positioned after start.': function() {
+      var array = [1, 2, 3, 4, 5];
+      var afterCopyWithin = [1, 1, 2, 3, 4];
+      array.myCopyWithin(1);
+      afterCopyWithin.forEach(function(num, i){
+        eq(num, array[i]);
+      }); 
+    },
+    // tests for start parameter
+    'It starts copy at start index.': function() {
+      var array = [1, 2, 3, 4, 5];
+      var afterCopyWithin = [4, 5, 3, 4, 5];
+      array.myCopyWithin(0, 3);
+      afterCopyWithin.forEach(function(num, i){
+        eq(num, array[i]);
+      }); 
+    },
+    'It calculates from end of array if start is negative.': function() {
+      var array = [1, 2, 3, 4, 5];
+      var afterCopyWithin = [4, 5, 3, 4, 5];
+      array.myCopyWithin(0, -2);
+      afterCopyWithin.forEach(function(num, i){
+        eq(num, array[i]);
+      }); 
+    },
+    'It defaults to zero if calculated start is negative': function() {
+      var array = [1, 2, 3, 4, 5];
+      var afterCopyWithin = [1, 1, 2, 3, 4];
+      array.myCopyWithin(1, -6);
+      afterCopyWithin.forEach(function(num, i){
+        eq(num, array[i]);
+      }); 
+    },
+   // tests for end parameter
+    'It copies up to but not including end.': function() {
+      var array = [1, 2, 3, 4, 5];
+      var afterCopyWithin = [2, 3, 3, 4, 5];
+      array.myCopyWithin(0, 1, 3);
+      afterCopyWithin.forEach(function(num, i){
+        eq(num, array[i]);
+      }); 
+    },
+    'It calculates from end of array if end is negative.': function() {
+      var array = [1, 2, 3, 4, 5];
+      var afterCopyWithin = [2, 3, 3, 4, 5];
+      array.myCopyWithin(0, 1, -2);
+      afterCopyWithin.forEach(function(num, i){
+        eq(num, array[i]);
+      }); 
+    },
+    'It does nothing if calculated end is less than zero': function() {
+      var array = [1, 2, 3, 4, 5];
+      var afterCopyWithin = [1, 2, 3, 4, 5];
+      array.myCopyWithin(0, 1, -6);
+      afterCopyWithin.forEach(function(num, i){
+        eq(num, array[i]);
+      }); 
+    },
+    // for using with objects
+    'It can be used on array-like objects': function() {
+      var object = {length: 5, 3: 1};
+      var afterCopyWithin = {0: 1, 3: 1, length: 5};
+      Array.prototype.myCopyWithin.call(object, 0, 3);
+      eq(JSON.stringify(object), JSON.stringify(afterCopyWithin));
+    },
+  });
+</script>

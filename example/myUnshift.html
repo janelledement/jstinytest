@@ -1,0 +1,67 @@
+<script src="../simpleTest.js"></script>
+<script>
+  /* 
+    The unshift method inserts the given values to the beginning of an array-like object.
+
+    unshift is intentionally generic; 
+    this method can be called or applied to objects resembling arrays.
+    Objects which do not contain a length property reflecting the last 
+    in a series of consecutive, zero-based numerical properties may not 
+    behave in any meaningful manner.  
+
+    Syntax: array.myUnshift(element1,...[elementN]);
+
+    Parameters: element1 is required, but can accept n number of elements to add.
+
+    Return: The new length property of the object upon which the method was called.
+
+    Specs: 
+      It returns the new length property of array.
+      It adds element1 to front of the array.
+      If adds n elements to array from last to first. eg: array.myUnshift(0, 1)..zero will be at 0 index
+      It can be used on array-like objects.
+  */
+
+  Array.prototype.myUnshift = function(element) {
+    var addedIndices = arguments.length;
+    var array = this;
+
+    array.length += addedIndices;
+    for( var i = array.length - 1; i >= addedIndices - 1; i--) {
+      array[i] = array[i - addedIndices];
+    }
+
+    for (var i = 0; i < arguments.length; i++) {
+      array[i] = arguments[i];
+    }
+
+    return this.length;
+  }
+
+  tests({
+    'It returns the new length property of array.': function() {
+      var fish = ['clown'];
+      fish.myUnshift('angel');
+      eq(fish.length, 2);
+    },
+    'It adds element1 to front of the array.': function() {
+      var fish = ['clown'];
+      fish.myUnshift('angel');
+      eq(fish[0], 'angel');
+      eq(fish[1], 'clown');
+    },
+    'If adds n elements to array from last to first.': function() {
+      var fish = ['clown'];
+      fish.myUnshift('angel', 'sturgeon');
+      eq(fish[0], 'angel');
+      eq(fish[1], 'sturgeon');
+      eq(fish[2], 'clown');
+    },
+    'It can be used on array-like objects.': function() {
+      var arrayLikeFish = {0: 'clown', length: 1};
+      Array.prototype.myUnshift.call(arrayLikeFish, 'angel');
+      eq(JSON.stringify(arrayLikeFish), JSON.stringify({0: 'angel', 1: 'clown', length: 2}));
+    },
+  });
+
+  </script>

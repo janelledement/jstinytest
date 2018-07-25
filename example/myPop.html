@@ -1,0 +1,47 @@
+<script src="../simpleTest.js"></script>
+<script>
+  /* 
+    Syntax: array.pop();
+
+    Specs:
+      Removes the last element of an array.
+      Returns the last element of an array on which it is called.
+      Can be used on array-like objects.
+      If pop is called on empty array, it returns undefined.
+    
+  */
+
+  Array.prototype.myPop = function() {
+    var popped = this[this.length - 1];
+    this.length -= 1;
+    return popped;
+  }
+
+  tests({
+    'It removes the last element of an array.': function() {
+      var myFish = ['angel', 'clown', 'mandarin', 'sturgeon'];
+      var popped = myFish.myPop();
+      var supposedFish = ['angel', 'clown', 'mandarin' ];
+      myFish.forEach(function(fish, i){
+        eq(fish, supposedFish[i]);
+      });
+    },
+    'It returns the last element of an array on which it is called.': function() {
+      var myFish = ['angel', 'clown', 'mandarin', 'sturgeon'];
+      var popped = myFish.myPop();
+      eq(popped, 'sturgeon');
+    },
+    'It can be used on array-like objects.': function() {
+      var arrayLikeObject = {0: 'angel', 1: 'clown', length: 2};
+      var popped = Array.prototype.myPop.call(arrayLikeObject);
+      eq(popped, 'clown');
+      eq(arrayLikeObject[0], 'angel');
+      eq(arrayLikeObject.length, 1);
+    },
+    'It returns undefined when called on an empty array': function() {
+      var array = [];
+      var popped = array.pop();
+      eq(popped, undefined);
+    }
+  });
+</script>

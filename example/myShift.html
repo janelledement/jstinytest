@@ -1,0 +1,59 @@
+<script src="../simpleTest.js"></script>
+<script>
+  /* 
+    Syntax: array.myShift();
+    Return: First array element or undefined if array is empty.
+
+    Specs: 
+      It removes the first element of the array.
+      It shifts each element of the array by - 1 index position.
+      It shortens the length of the array by one.
+      It returns the removed array element.
+      It returns undefined if array is empty.
+      It can be used on array-like objects.
+  */
+
+  Array.prototype.myShift = function() {
+    var firstElement = this[0];
+
+    if (this.length === 0) {
+      return undefined;
+    }
+
+    for (var i = 0; i < this.length; i++) {
+      this[i] = this[i + 1];
+    }
+
+    this.length -= 1;
+
+    return firstElement;
+  }
+
+  tests({
+    'It returns the first element of array.': function() {
+      var fish = ['angel', 'clown'];
+      var shifted = fish.myShift();
+      eq(shifted, 'angel');
+    },
+    'It returns undefined if array is empty.': function() {
+      var array = [];
+      var shifted = array.myShift();
+      eq(shifted, undefined);
+    },
+    'It removes the first element and shifts each element after by - 1 index position.': function() {
+      var fish = ['angel', 'clown'];
+      var shifted = fish.myShift();
+      eq(fish[0], 'clown');
+    },
+    'It shortens the length of the array by one.': function() {
+      var fish = ['angel', 'clown'];
+      var shifted = fish.myShift();
+      eq(fish.length, 1);
+    },
+    'It can be used on array-like objects.': function() {
+      var arrayLikeFish = {0: 'angel', 1: 'clown', length: 2};
+      var shifted =  Array.prototype.myShift.call(arrayLikeFish);
+      eq(JSON.stringify(arrayLikeFish), JSON.stringify({0: 'clown', length: 1}));
+    },
+  });
+</script>

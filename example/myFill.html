@@ -1,0 +1,120 @@
+<script src="../simpleTest.js"></script>
+<script>
+  /*
+
+
+    Syntax: arr.myFill(value[, start[, end]])
+
+    Parameters:
+      value: value to fill array.
+      start: index at which to start, the default is zero.
+      end: index at which to stop, the default is zero.
+
+    Return: The modified array.
+
+    Specs: 
+      General:
+        It returns the same array not a copy.
+        It accepts a given value parameter and fills array with it.
+      Optional parameters: 
+        It accepts a start index at which to start filling array.
+        It starts at zero index if not specified.
+        It calculates start from end of array if negative.
+        If calculated start is negative then default to zero.
+        It accepts a end index at which to stop filling array.
+        It stops at array.length if not specified.
+        It calculates end index from end of array if negative.
+      Edge:
+        It can be used on array-like objects. 
+      
+  */
+
+  Array.prototype.myFill = function(value, start, end) {
+    var array = this;
+
+    if (!start) {
+      var start = 0;
+    }
+    if (start < 0) {
+      start += array.length;
+      if (start < 0) {
+        start = 0;
+      }
+    } 
+
+    if (!end && end !== 0) {
+      var end = array.length;
+    }
+    if (end < 0) {
+      end += array.length;
+    }
+
+
+    for (var i = start; i < end; i++) {
+      array[i] = value;
+    }
+
+    return array;
+  }
+
+  tests({
+    'It returns the same array, not a copy': function() {
+       var array = [1];
+       var filled = array.myFill(2);
+       eq(array, filled)
+    },
+    'It accepts a given value parameter and fills array with it.': function() {
+      var array = [1];
+      var filled = array.myFill(2);
+      eq(array[0], 2);
+    },
+    'It accepts a start index at which to start filling array.': function() {
+      var array = [1, 2];
+      var filled = array.myFill(3, 1);
+      eq(array[0], 1);
+      eq(array[1], 3)
+    },
+    'It starts at zero index if not specified.': function() {
+      var array = [1, 2];
+      var filled = array.myFill(3);
+      eq(array[0], 3);
+      eq(array[1], 3)
+    },
+    'It calculates start from end of array if negative.': function() {
+      var array = [1, 2];
+      var filled = array.myFill(3, -1);
+      eq(array[0], 1);
+      eq(array[1], 3)
+      eq(array.length, 2);
+    },
+    'If calculated start is negative then default to zero.': function() {
+      var array = [1, 2];
+      var filled = array.myFill(3, -3);
+      eq(array[0], 3);
+      eq(array[1], 3)
+      eq(array.length, 2);
+    },
+    'It accepts an end index at which to stop filling the array.': function() {
+      var array = [1, 2, 3, 4];
+      var filled = array.myFill(1, 1, 2);
+      eq(array[0], 1);
+      eq(array[1], 1);
+      eq(array[2], 3);
+      eq(array[3], 4);
+    },
+    'It calculates end index from end of array if negative.': function() {
+      var array = [1, 2, 3, 4];
+      var filled = array.myFill(1, 1, -2);
+      eq(array[0], 1);
+      eq(array[1], 1);
+      eq(array[2], 3);
+      eq(array[3], 4);
+    },
+    'It can be used on array-like objects': function() {
+      var arrayLikeObject = {length: 1};
+      [].myFill.call(arrayLikeObject, 2);
+      eq(JSON.stringify(arrayLikeObject), JSON.stringify({0: 2, length: 1}));
+    }
+  });
+
+</script>

@@ -76,12 +76,14 @@
     },
     'It adds to the length property of object for each element pushed': function() {
       var object = {length: 0};
-      eq([].myPush.call(object, 1, 2), 2);  
+      eq([].myPush.call(object, 1, 2), 2); 
+      eq(JSON.stringify({0: 1, 1: 2, length: 2}), JSON.stringify(object)); 
     },
-    'It can handle objects with no length property.': function() {
+    'It can handles objects with no length property.': function() {
       var object = {};
       [].myPush.call(object, 1);
-      eq(object.length, 1); 
+      eq(object.length, 1);
+      eq(JSON.stringify({0: 1, length: 1}), JSON.stringify(object)); 
     },
   });
 

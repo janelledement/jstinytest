@@ -19,9 +19,20 @@
     var temporaryEndElement;
     
     for (var i = 0; i < middle; i++) {
-      temporaryEndElement = array[endIndex];
-      array[endIndex] = array[i];
-      array[i] = temporaryEndElement;
+      if (endIndex in array && i in array) {
+        temporaryEndElement = array[endIndex];
+        array[endIndex] = array[i];
+        array[i] = temporaryEndElement;     
+      } else {
+        // dealing with holes (empty not undefined)
+        if (!(endIndex in array) && (i in array)) {
+          array[endIndex] = array[i];
+          delete array[i];
+        } else if (!(i in array) && (endIndex in array)) {
+          array[i] = array[endIndex];
+          delete array[endIndex];
+        }
+      }
       --endIndex;
     }
     
@@ -36,6 +47,19 @@
       eq(array[1], 3);
       eq(array[2], 2);
       eq(array[3], 1);
+    },
+    'It handles holes in array and not substitute undefined': function() {
+      var array = [, 2, 3]
+      array.myReverse();
+      eq(2 in array, false);
+      array.myReverse();
+      eq(0 in array, false);
+
+      var array = [, 2, ,];
+      array.myReverse();
+      eq(0 in array, false);
+      eq(array[1], 2);
+      eq(2 in array, false);
     }
   });
 

@@ -107,6 +107,11 @@
       var string = Array.prototype.myJoin.call(object);
       eq(string, 'one,two');
     },
+    'It should handle different data types.': function() {
+      var array = ['one', 2, [3], {four: 'four'}, function(){}];
+      var string = array.myJoin(',');
+      eq(string, "one,2,3,[object Object],function(){}");
+    }
   });
 
 </script>

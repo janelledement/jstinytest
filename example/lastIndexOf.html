@@ -19,7 +19,7 @@
     }
 
     for (var i = lastIndex; i >= 0; i--) {
-      if (array[i] === searchElement) {
+      if (array[i] === searchElement && i in array) {
         return i;
       }
     }
@@ -68,8 +68,12 @@
       var array = [4, 4, 4, 4];
       var index = lastIndexOf(array, 4, -5);
       eq(-1, index);
+    },
+    'It should skip holes in array': function() {
+      var array = [,,,];
+      var index = lastIndexOf(array, undefined);
+      eq(-1, index);
     }
     
   });
-
 </script>

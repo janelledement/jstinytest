@@ -29,10 +29,15 @@
         index = searchIndex;  
       }
     }
-    console.log(Array.isArray(this));
     for (var i = index; i < length; i++) {
       if (this[i] === searchElement) {
         return true;
+      }
+      // deal with NaN
+      if (typeof searchElement === 'number' && typeof this[i] === 'number') {
+        if (isNaN(searchElement) && isNaN(this[i])) {
+          return true;
+        }
       }
     }
     return false;
@@ -81,6 +86,11 @@
       eq(isIncluded, true);
       var isIncluded = [].myIncludes.apply(object, ['b']);
       eq(isIncluded, false);
+    },
+    'It can detect NaN in array': function() {
+      // this has to do with the sameValueZero method of comparison that is used in native documentation
+
+      eq([NaN].myIncludes(NaN), true);
     }
     
   });

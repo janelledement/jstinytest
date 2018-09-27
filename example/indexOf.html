@@ -32,7 +32,7 @@
     }
 
     for (var i = index; i < length; i++) {
-      if (element === array[i]) {
+      if (element === array[i] && i in array) {
         return i;
       }
     }
@@ -71,6 +71,11 @@
       var array = [1, 2, 3];
       var index = indexOf(array, 1, -4);
       eq(index, 0);
+    },
+    'It should skip holes in array': function() {
+      var array = [,,,];
+      var index = indexOf(array, undefined);
+      eq(-1, index);
     }
   });
 

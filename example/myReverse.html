@@ -48,7 +48,7 @@
       eq(array[2], 2);
       eq(array[3], 1);
     },
-    'It handles holes in array and not substitute undefined': function() {
+    'It handles holes in array and does not substitute undefined': function() {
       var array = [, 2, 3]
       array.myReverse();
       eq(2 in array, false);

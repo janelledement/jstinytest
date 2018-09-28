@@ -14,14 +14,14 @@
 
   Specs: 
     It returns an array.
+    It returns the same array.
     It returns the same array on which it is called but sorted according to unicode.
     It accepts a callback function for different methods of sorting.
     It sorts all undefined elements to the back of the array.
     It does not run the callback function on undefined elements.
 
   */
-
-  Array.prototype.mySort = function(callback) {
+  Array.prototype.mySort = function (callback) {
     var array = this;
     var temp;
     var end = array.length - 1;
@@ -64,48 +64,52 @@
   }
 
   tests({
-    'It returns an array': function() {
+    'It returns an array': function () {
       var array = [];
       var sorted = array.mySort();
       eq(Array.isArray(array), true);
     },
-    'It sorts according to unicode.': function() {
+    'It returns the same array': function () {
+      var array = [2, 1, 3];
+      var sorted = array.sort();
+      eq(sorted, array);
+    },
+    'It sorts according to unicode.': function () {
       var months = ['March', 'Jan', 'Feb', 'Dec'];
       months.mySort();
       var supposedMonths = ["Dec", "Feb", "Jan", "March"];
-      supposedMonths.forEach(function(el, i) {
+      supposedMonths.forEach(function (el, i) {
         eq(el, months[i]);
       });
       var numbers = [1, 30, 4, 21];
       numbers.mySort();
       var supposedNumbers = [1, 21, 30, 4];
-      supposedNumbers.forEach(function(num, i) {
+      supposedNumbers.forEach(function (num, i) {
         eq(num, supposedNumbers[i])
       });
     },
-    'It accepts a callback function for different methods of sorting.': function() {
+    'It accepts an optional callback function for different methods of sorting.': function () {
       var array = [1, 30, 4, 21];
-      array.mySort(function(a, b) {
+      array.mySort(function (a, b) {
         return a - b;
       });
-      console.log(array);
       var supposedNumbers = [1, 4, 21, 30];
-      supposedNumbers.forEach(function(num, i) {
+      supposedNumbers.forEach(function (num, i) {
         eq(num, array[i]);
       });
     },
-    'It sorts all undefined elements to the back of the array.': function() {
+    'It sorts all undefined elements to the back of the array.': function () {
       var numbers = [1, 30, undefined, 4, undefined, 21];
       numbers.mySort();
       var supposedNumbers = [1, 21, 30, 4, undefined, undefined];
-      supposedNumbers.forEach(function(num, i) {
+      supposedNumbers.forEach(function (num, i) {
         eq(num, supposedNumbers[i])
       });
     },
-    'It does not run the callback function on undefined elements.': function() {
+    'It does not run the callback function on undefined elements.': function () {
       var numbers = [1, 30, undefined, 4, 21, undefined];
       var numberOfTimesCallbackHasBeenRun = 0;
-      numbers.mySort(function(a, b){
+      numbers.mySort(function (a, b){
         numberOfTimesCallbackHasBeenRun++
         return a - b;
       });

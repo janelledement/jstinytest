@@ -1,0 +1,339 @@
+<script src="../simpleTest.js"></script>
+<script>
+  
+  // Syntax: 
+    // splice(array, startIndex[, deleteCount[, item1[, item2[, ...]]]])
+
+  // About Parameters: 
+    // array: The array being spliced
+    // start: Where to start splicing
+    // deleteCount: How many items to delete
+    // item1: Items to add
+
+  // Return: 
+    // An array containing the deleted elements. If only one element is removed, an array of one element is returned.
+    // If no elements are removed, an empty array is returned.
+  
+  function splice(array, start, deleteCount) {
+    var deletedItems = [];
+
+    if (arguments.length === 1) {
+      return deletedItems;
+    }
+
+    // Establish startIndex (switch case? might change this later)
+    if (isNaN(start) || !Boolean(start)) {
+      start = 0;
+    } else if (start % 1 !== 0) {
+      start = parseInt(start);
+    }
+    if (start > array.length) {
+      start = array.length;
+      deleteCount = 0;
+    }
+    if (start < 0) {
+      start += array.length;
+      if (start < 0) {
+        start = 0;
+      }
+    }
+    
+    // Establish deleteCount;
+    if (arguments.length === 2) {
+      deleteCount = array.length - start;
+    }
+
+    if (isNaN(deleteCount) || deleteCount < 0 || !Boolean(deleteCount)) {
+      deleteCount = 0;
+    } else if (deleteCount % 1 !== 0) {
+      deleteCount = parseInt(deleteCount);
+    } 
+
+    if (deleteCount > array.length - start) {
+      deleteCount = array.length - start;
+    }
+
+    // Establish addCount;
+    var addCount = arguments.length - 3;
+    // Establish index of arguments for add-ons
+    var addIndexOfArguments = 3; 
+
+
+    // Establish amount to subtract from original array.length
+    // if there are more deletions than additions.
+    var amountToSubtractFromArrayLength = deleteCount;
+    if (addCount > 0 && deleteCount > 0) {
+      amountToSubtractFromArrayLength -= addCount;
+    }
+    
+
+   // Actual addition and deletion work starts below
+    var endIndex = deleteCount + start;
+
+    for (var i = start; i < endIndex; i++) {
+      // Start by adding delete items to the return array
+      if (i in array) {
+        deletedItems.push(array[i]);
+      } else {
+        deletedItems.length++ // this is for holes, so they get added as holes instead of undefined
+      }
+      
+      // If there is an addition to make, simply replace the deleted item
+      // If not, shift all items after deleted item over one so that 
+      // the deleted index position ends up at the end of the array.
+      if (addCount > 0) {
+        array[i] = arguments[addIndexOfArguments];
+        addIndexOfArguments++;
+        addCount--;
+      } else {
+        var previousAddCount = arguments.length - 3;
+        var endIndexForInnerLoop = array.length - deleteCount + previousAddCount;
+        var availableElementIndex = i + deleteCount - previousAddCount;
+        
+        for (var j = i; j < endIndexForInnerLoop; j++) {
+          array[j] = array[availableElementIndex];
+          availableElementIndex++
+        }
+      }
+                   
+    } 
+    
+    // If addCount is still greater than zero, that means that 
+    // there were more additions than deletions. Those additions 
+    // have yet to be completed.
+    // Else, subtract the excess holes from previous deletions from the end of array.
+    if (addCount > 0) {
+      start += deleteCount;
+      addIndexOfArguments = arguments.length - 1;
+
+      while (addCount > 0) {
+        array.length++
+        for (var i = array.length - 1; i > start; i--) {
+          array[i] = array[i -1];
+        }
+        array[start] = arguments[addIndexOfArguments];
+        addCount--
+        addIndexOfArguments-- 
+      }
+
+    } else {
+      array.length -= amountToSubtractFromArrayLength;
+    }
+     
+
+    return deletedItems;
+  }
+  
+  tests({
+    // General Tests
+    '1. It returns an array': function() {
+      var array = [];
+      eq(Array.isArray(splice(array)), true)
+    },
+    '2. It returns an empty array if the only argument passed is the array.': function () {
+      var returned = splice([]);
+      eq(Array.isArray(returned), true);
+      eq(returned.length, 0);
+    },
+    '3. It deletes all elements starting at startIndex if only given array and startIndex.': function () {
+      var array = [1, 2, 3];
+      splice(array,  0);
+      eq(array.length, 0);
+    },
+    '4. It returns array of deleted items.': function () {
+      var array = [1, 2];
+      var spliced = splice(array, 0, 2);
+      eq(spliced[0], 1);
+      eq(spliced[1], 2); 
+    },
+
+    // Start parameter tests    
+    '5. It sets startIndex at array.length if it greater than array.length.': function() {
+      var array = [1, 2, 3];
+      var removed = splice(array, 4, 2);
+      var supposedArray = [1, 2, 3];
+      supposedArray.forEach(function(num, i) {
+        eq(num, array[i]);
+      });
+      eq(removed.length, 0);
+      eq(Array.isArray(removed), true); 
+    },
+    '6. It defaults to zero if startIndex is anything but a number.': function() {
+      var array = [1];
+      var spliced = splice(array,  'hello');
+      eq(array.length, 0);
+      eq(spliced[0], 1);
+    },
+    '7. It defaults to zero if startIndex fails isNaN but are also is not a numbers.': function() {
+      var array = [1];
+      var spliced = splice(array, '');
+      eq(array.length, 0);
+      eq(spliced[0], 1);
+    },
+    '8. It calculates startIndex from end of array if negative.': function () {
+      var myFish = ['angel', 'clown', 'mandarin', 'sturgeon'];
+      var removed = splice(myFish, -2, 1);
+      var supposedFish = ["angel", "clown", "sturgeon"];
+      supposedFish.forEach(function(fish, i) {
+        eq(fish, myFish[i]);
+      }); 
+      eq(removed[0], 'mandarin'); 
+    },
+    '9. It defaults to zero if calculated startIndex is negative.': function () {
+      var myFish = ['angel', 'clown', 'mandarin', 'sturgeon'];
+      var removed = splice(myFish, -5, 1);
+      var supposedFish = ["clown", 'mandarin', "sturgeon"];
+      supposedFish.forEach(function(fish, i) {
+        eq(fish, myFish[i]);
+      }); 
+      eq(removed[0], 'angel');
+    },
+    '10. It defaults to floor of number if startIndex is a float': function() {
+       var array = [1, 2, 3];
+       splice(array, 1.6);
+       eq(array.length, 1);
+       eq(array[0], 1);
+    },
+
+    // Delete parameter Tests
+    '11. It deletes number of elements specified in deleteCount if provided.': function () {
+      var array = [1];
+      var spliced = splice(array, 0, 1);
+      eq(array.length, 0);
+      eq(spliced[0], 1);
+    },
+    '12. It defaults to zero if deleteCount is not a number.': function () {
+      var array = [1];
+      var spliced = splice(array, 0, {});
+      eq(spliced.length, 0);
+      eq(array[0], 1);
+    },
+    '13. It defaults to zero on deleteCount values that fail isNaN() but are also not numbers.': function() {
+      var array = [1];
+      var spliced = splice(array, 0, []);
+      eq(spliced.length, 0);
+      eq(array[0], 1);
+    },
+    '14. It defaults to floor of number if deleteCount is a float.': function () {
+      var array = [1, 2, 3];
+       splice(array, 0, 1.7);
+       eq(array.length, 2);
+       eq(array[0], 2);
+       eq(array[1], 3); 
+    },
+    '15. It deletes nothing if deleteCount is zero or negative.': function () {
+      var array = [1];
+      var spliced = splice(array, 0, -1);
+      eq(spliced.length, 0);
+      eq(array[0], 1);
+
+      var array = [1];
+      var spliced = splice(array, 0, 0);
+      eq(spliced.length, 0);
+      eq(array[0], 1);
+    },
+    
+    '16. It deletes all elements after start if value of deleteCount is more than array.length - startIndex.': function () {
+      var array = [1, 2];
+      var spliced = splice(array, 1, 5);
+      eq(array.length, 1);
+      eq(spliced.length, 1);
+      eq(array[0], 1);
+      eq(spliced[0], 2);
+      
+    },
+    '17. It deletes array holes like regular elements.': function () {
+      var array = [,];
+      var spliced = splice(array, 0, 1);
+      eq(array.length, 0);
+      eq(spliced.length, 1);
+      eq(0 in spliced, false)
+    },
+    '18. It handles deleting 2 items from index 2.': function() {
+      var myFish = ['parrot', 'anemone', 'blue', 'trumpet', 'sturgeon'];
+      var removed = splice(myFish, 2, 2);
+      eq(removed[0], 'blue');
+      eq(removed[1], 'trumpet');
+      eq(myFish[0], 'parrot');
+      eq(myFish[1], 'anemone');
+      eq(myFish[2], 'sturgeon');     
+    },
+    
+
+    // Mixing in adding as well as deletions testing.
+    '19. It adds optional items at start index.': function () {
+      var array = [1, 2];
+      splice(array, 1, 1, 1);
+      eq(array[0], 1);
+      eq(array[1], 1);
+    },
+    '20. It handles adding more items than deleting.': function () {
+      var myFish = ['angel', 'clown', 'trumpet', 'sturgeon'];
+      var removed = splice(myFish, 0, 2, 'parrot', 'anemone', 'blue');
+      var supposedFish = ['parrot', 'anemone', 'blue', 'trumpet', 'sturgeon']
+      supposedFish.forEach(function(fish, i) {
+        eq(fish, myFish[i]);
+      }); 
+    },  
+    '21. It handles deleting more items than adding.': function () {
+      var array = [1, 2, 3, 4];
+      splice(array, 1, 2, 'two');
+      var supposedArray = [1, 'two', 4];
+      supposedArray.forEach(function(element, i) {
+        eq(element, array[i]);
+      });   
+    },
+    '22. It changes array.length if more items are added than deleted and vice versa.': function () {
+      var myFish = ['angel', 'clown', 'trumpet', 'sturgeon'];
+      var removed = splice(myFish, 0, 2, 'parrot', 'anemone', 'blue');
+      eq(myFish.length, 5);
+      splice(myFish, 3, 2, 'gold');
+      eq(myFish.length, 4);
+    },
+    '23. It handles adding a single item when nothing is deleted.': function() {
+      var array = [1, 2];
+      splice(array, 1, 0, 3);
+      eq(array[0], 1);
+      eq(array[1], 3);
+      eq(array[2], 2);
+    },
+    '24. It handles adding items when nothing is deleted': function() {
+      var array = [1, 3, 4];
+      splice(array, 1, 0, 2);
+      var supposedArray = [1, 2, 3, 4];
+      supposedArray.forEach(function(element, i) {
+        eq(element, array[i]);
+      }); 
+    }, 
+    '25. It handles adding and deleting from array with holes.': function () {
+      var array = [1, , 3, , 5];
+      splice(array, 1, 1, 2);
+      splice(array, 3, 2, 4);
+      eq(array[0], 1);
+      eq(array[1], 2);
+      eq(array[2], 3);
+      eq(array[3], 4);  
+    },
+    '26. It handles holes when there are more elements deleted than added.': function() {
+      var array = [1, 2, 3];
+      splice(array, 1, 2, 1);
+      eq(array[0], 1);
+      eq(array[1], 1);
+      eq(array.length, 2);
+    }, 
+    '27. It handles adding items when nothing is deleted.': function() {
+      var array = [1, 2];
+      splice(array, 1, 0, 3, 4);
+      eq(array[0], 1);
+      eq(array[1], 3);
+      eq(array[2], 4);
+      eq(array[3], 2);
+      eq(array.length, 4);
+    }
+    
+    
+
+  }); 
+
+    
+</script>
